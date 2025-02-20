@@ -1,0 +1,77 @@
+# Services
+services:
+
+  # Nginx Service
+  nginx:
+    container_name: web
+    image: nginx:latest
+    ports:
+      - 8080:80
+    restart: always
+    environment:
+      - TZ=America/Edmonton
+    links:
+      - 'php'
+    volumes:
+      - ./www/typecho/:/var/www/html/
+      - ./nginx/conf/:/etc/nginx/conf.d/
+      - ./nginx/logs/:/var/log/nginx/
+    depends_on:
+      - php
+      - mariadb
+    networks:
+      - lemp-net
+
+  # PHP-FPM Service
+  php:
+    container_name: php8
+    build: php
+    expose:
+      - 9000
+    restart: always
+    environment:
+      - TZ=America/Edmonton
+    volumes:
+      - ./www/typecho/:/var/www/html/
+      - ./php/php-log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+    depends_on:
+      - mariadb
+    networks:
+      - lemp-net
+
+  # MariaDB Service
+  mariadb:
+    container_name: db
+    image: mariadb:10.11
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPass!2024
+      MYSQL_DATABASE: typecho
+      MYSQL_USER: dbmgr
+      MYSQL_PASSWORD: userPass!2024
+      TZ: America/Edmonton
+    volumes:
+      - ./init/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - ./dbdata:/var/lib/mysql
+    networks:
+      - lemp-net
+
+
+  # phpMyAdmin Service
+  phpmyadmin:
+      container_name: phpadm
+      image: phpmyadmin/phpmyadmin:latest
+      restart: always
+      ports:
+        - 8090:80
+      environment:
+        PMA_HOST: mariadb
+      depends_on:
+        - mariadb
+      networks:
+        - lemp-net
+
+# Networks
+networks:
+  lemp-net:
