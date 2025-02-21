@@ -1,4 +1,4 @@
-# Dockerize Nginx, MariaDB and PHP for Projects
+# Dockerize Nginx, MariaDB and PHP for Typecho Blog Projects
 
 by Marcus Zou | 16 Feb 2025 | 3 minutes Reading - 20 minutes Hands-on
 
