@@ -54,10 +54,11 @@ Create the folder structure and files.
 mkdir lemp-demo
 cd lemp-demo
 ## generate sub-folders
-mkdir -p dbdata init nginx/conf nginx/logs php www/html
+mkdir -p db/{conf,data,env,logs} init nginx/{conf,logs} php www/html
 ## generate files
 touch README.md docker-compose.yml init/initdb.sql nginx/conf/default.conf 
-touch php/Dockerfile php/php.ini php/php-log.conf www/html/index.php
+touch db/{conf/my.cnf,env/mysql.env} 
+touch php/{Dockerfile,php.ini,php-log.conf} www/html/index.php
 ## display the folder/files structure
 tree ../lemp-demo
 ```
@@ -67,7 +68,13 @@ Here is the output of last command above: Exactly same as what we designed, fant
 ```shell
 ../lemp-demo
 ├── README.md
-├── dbdata
+├── db
+│   ├── conf
+│   │   └── my.cnf
+│   ├── data
+│   ├── env
+│   │   └── mysql.env
+│   └── logs
 ├── docker-compose.yml
 ├── init
 │   └── initdb.sql
@@ -100,10 +107,10 @@ Add the following lines as a starter:
 ```shell
 services:
   nginx:
+    container_name: web
     image: nginx:latest
-      container_name: web
-      ports:
-        - 8080:80
+    ports:
+      - 8080:80
 ```
 
 The above file will download the latest Nginx image, create an Nginx container (internal port 80), and expose it on port 8080.
@@ -134,21 +141,23 @@ Now, open your web browser and access your Nginx container using the URL **http:
 3.1 - First, edit the `www/html/index.php` file to verify your PHP version.
 
 ```
-nano ./www/html/index.php
+nano www/html/index.php
 ```
 
 Add the following lines:
 
 ```
 <!DOCTYPE html>
-<head>
-	<title>Hello World!</title>
-</head>
+<html>
+    <head>
+        <title>Hello World!</title>
+    </head>
 
-<body>
-	<h1>Hello World!</h1>
-	<p><?php echo 'We are running PHP, version: ' . phpversion(); ?></p>
-</body>
+    <body>
+        <h1>Hello World!</h1>
+        <p><?php echo 'We are running PHP, version: ' . phpversion(); ?></p>
+    </body>
+</html>
 ```
 
 Save and close the file.
@@ -156,7 +165,7 @@ Save and close the file.
 3.2 - Then edit the Nginx default configuration file to run your PHP application:
 
 ```
-nano ./nginx/conf/default.conf
+nano nginx/conf/default.conf
 ```
 
 Add the following lines:
@@ -206,7 +215,7 @@ Save and close the file.
 3.3 - Edit the `docker-compose.yml` file:
 
 ```
-nano ./docker-compose.yml
+nano docker-compose.yml
 ```
 
 Modify the contents while bringing in the `php` container:
@@ -273,21 +282,22 @@ Now, open your web browser and access the URL **http://localhost:8080**. You sho
 Next, we will check whether our mounted volume works or not. To do so, edit the `./www/html/index.php` file:
 
 ```
-nano ./www/html/index.php
+nano www/html/index.php
 ```
 
 Change the line “Hey folks, I am going to showcase the PHP information sheet below:”, also modify the next line with `phpinfo()` function:
 
 ```
 <!DOCTYPE html>
-<head>
+<html>
+    <head>
         <title>Hello World!</title>
-</head>
-
-<body>
+    </head>
+    <body>
         <h1>Hey folks, I am going to showcase the PHP information sheet below:</h1>
         <p><?php phpinfo(); ?></p>
-</body>
+    </body>
+</html>
 ```
 
 Now, refresh your web page. You should see your modified page on the screen:
@@ -296,29 +306,34 @@ Now, refresh your web page. You should see your modified page on the screen:
 
 
 
-## 4– Create a MySQL Container
+## 4– Create a MySQL/MariaDB Container
 
 
 
 Generally speaking, MySQL database was bought over by Oracle, which is phasing it to MySQL Enterprise, while some techies in Oracle are maintaining the MySQL community edition. Alternatively, MariaDB is a perfect replacement of MySQL due to the active development by the community. I always prefer MariaDB other than MySQL nowadays. Here is the comparison table of the two.
 
-| Product | Version       | Release Date | Remarks            | Latest Edition        |
-| ------- | ------------- | ------------ | ------------------ | --------------------- |
-| MySQL   | 8.0.40        | 15 Oct 2024  | Oracle Linux based | 8.0.42                |
-|         | 8.0.40-debian | 15 Oct 2024  | Debian Based       | 8.0.42                |
-| MariaDB | 10.11.0       | 6 Feb 2023   | LTS                | 10.11.11 (4 Feb 2025) |
-|         | 11.4.0        | 14 Dec 2023  | LTS                | 11.4.3 (14 Aug 2024)  |
+| Product     | Version       | Release Date | Remarks            | Latest Edition        |
+| ----------- | ------------- | ------------ | ------------------ | --------------------- |
+| MySQL       | 8.0.35        | 25 Oct 2023  | Oracle Linux based | 8.0.41 (21 Jan 2025)  |
+|             | 8.0.35-debian | 25 Oct 2023  | Debian Based       | 8.0.41 (21 Jan 2025)  |
+| __MariaDB__ | __10.11__     | 6 Feb 2023   | LTS, Ubuntu based  | 10.11.11 (4 Feb 2025) |
+|             | 11.4          | 14 Dec 2023  | LTS, Ubuntu based  | 11.4.3 (14 Aug 2024)  |
 
-Please note, if specifying version in 2 digits only, e.g.: "10.11", it points to the latest minor version of "10.11.11".
+Please note, 
+
+- If specifying MariaDB version in 2 digits only, e.g.: "10.11", it points to the latest minor version of "10.11.11". 
+- The MySQL container has quite some issues than MariaDB, for instance, (1) the old way of configuring socket via `my.cnf` file, (2) MySQL container crashes and it's very hard to trouble-shoot, while the regular installing in Linux has no such issue.
+- The MySQL container is almost twice big-sized against MariaDB container (600MB vs. 330MB).
+- Configuring `my.cnf` file is not needed if using MariaDB.
 
 
 
 Now we will create a MySQL database container and link it to all other containers.
 
-4.1 - First, we must modify the PHP image and install the PHP extensions for driving PHP to connect to the MySQL/MariaDB database. So, edit the `php/Dockerfile` to build a **custom PHP image** while installing the PHP extensions:
+__4.1__ - First, we must modify the PHP image and install the PHP extensions for driving PHP to connect to the MySQL/MariaDB database. So, edit the `php/Dockerfile` to build a **custom PHP image** while installing the PHP extensions:
 
 ```
-nano ./php/Dockerfile
+nano php/Dockerfile
 ```
 
 Add the following lines:
@@ -337,7 +352,27 @@ RUN docker-php-ext-install curl gd mbstring mysqli pdo pdo_mysql xml zip
 
 Save and close the file. 
 
-4.2 - Creating a test database is needed while firing up the `mysql` database container since we are going to connect to such for a test of connectivity. So edit the `init/initdb.sql` file and load it up later into the `mysql` database contianer.
+Also configure the php-fpm by `nano php/php.ini`, which will be mapped in the `docker-compose.yml` later.
+
+```shell
+date.timezone=UTC
+display_errors=On
+log_errors=On
+upload_max_filesize= 80M
+post_max_size= 80M
+memory_limit = 256M
+```
+
+And configure the logs by `nano php/php-log.conf`, which will also be mapped later.
+
+```shell
+php_admin_flag[log_errors] = on
+php_flag[display_errors] = off
+```
+
+__4.2__ - Creating a test database is needed while firing up the `mysql` database container since we are going to connect to such for a test of connectivity. So edit the `init/initdb.sql` file and load it up later into the `mysql` database container. 
+
+__Please note__: This step is just for test the PHP function accessing MySQL/MariaDB database records only. So you don't need to add the `initdb.sql` script in first place to create database in MySQL/MariaDB container since the famous CMS/Blog layers (WordPress, Typecho, etc.) have decent build-in intractability against database. 
 
 ```shell
 nano init/initdb.sql
@@ -347,14 +382,37 @@ Here are the contents of the SQL script:
 
 ```shell
 CREATE DATABASE IF NOT EXISTS testdb;
-CREATE USER 'root' IDENTIFIED BY 'rootPass!2024';
-GRANT ALL PRIVILEGES ON typecho.* TO 'root';
+CREATE DATABASE IF NOT EXISTS devdb;
+CREATE DATABASE IF NOT EXISTS proddb;
+CREATE USER 'zenusr'@'localhost' IDENTIFIED BY 'userP@ss2024';
+GRANT ALL PRIVILEGES ON `testdb`.* TO 'zenusr'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON `devdb`.* TO 'zenusr'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 FLUSH PRIVILEGES;
 ```
 
-Please note, we create the database `testdb` using the root user intentionally, since we are going to test the connectivity via different users: `dbuser` and `root`.
+Please note, 
 
-4.3 - Edit the `docker-compose.yml` file to create a MySQL container and build PHP container to hold the database and tables:
+- we created three databases `testdb`, `devdb`, and `proddb` using the root user (by default);
+- created a `zenusr` user with password ("@'%'" means: MySQL treats '%' as a wildcard matching any client who connects via TCP. So any hostname or any IP address, including 127.0.0.1);
+- intentionally, we assigned `zenusr` to 2 databases only: `testdb` and `devdb`, while `root` user can access all of the databases, since we are going to test and compare the connectivity via different users: `zenusr` and `root`. 
+- obviously, `zenusr` cannot access `proddb` database due to lack of privileges.
+
+__4.3__ - Update the MySQL/MariaDB env file at `db/env/mysql.env`:
+
+```shell
+nano db/env/mysql.env
+```
+
+And the contents be like:
+
+```shell
+MYSQL_ROOT_PASSWORD=rootP@ss2024
+MYSQL_USER=zenusr
+MYSQL_PASSWORD=userP@ss2024
+```
+
+__4.4__ - Edit the `docker-compose.yml` file to create a MySQL container and build PHP container to hold the database and tables:
 
 ```
 nano docker-compose.yml
@@ -370,100 +428,108 @@ services:
   nginx:
     container_name: web
     image: nginx:latest
+    restart: always
     ports:
       - 8080:80
     links:
-      - 'php'
+      - php
     volumes:
       - ./www/html/:/var/www/html/
       - ./nginx/conf/:/etc/nginx/conf.d/
+      - ./nginx/conf/:/var/log/nginx/
     depends_on:
       - php
+      - mariadb
+    networks:
+      - lemp-demo
 
   # PHP-FPM Service
   php:
     container_name: php8
     build: php
+    restart: always
     expose:
       - 9000
     volumes:
       - ./www/html/:/var/www/html/
+      - ./php/php-log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
     depends_on:
-      - mysql
+      - mariadb
+    networks:
+      - lemp-demo
 
-  # MySQL Service
-  mysql:
-    container_name: db
-    image: mysql:8.0.40
-    environment:
-      MYSQL_ROOT_PASSWORD: rootPass!2024
-      MYSQL_DATABASE: testdb
-      MYSQL_USER: dbuser
-      MYSQL_PASSWORD: userPass!2024
+  # MariaDB Service
+  mariadb:
+    container_name: mariadb
+    image: mariadb:10.11
+    restart: always
+    expose:
+      - 3306:3306
+    env_file:
+      - ./db/env/mysql.env
     volumes:
       - ./init/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
-      - ./dbdata:/var/lib/mysql
+      - ./db/data/:/var/lib/mysql/
+      - ./db/logs/:/var/log/mysql/
+    networks:
+      - lemp-demo
 
-# Volumes
-volumes:
-  dbdata:
+# Networks
+networks:
+  lemp-demo:
 ```
 
 Save and close the file.
 
 Please note the changes in the `docker-compose.yml` file:
 
-- modified `image:8.1-fpm` to `build: php` in the `php` container part,
+- modified `image:8.1-fpm` to `build: php` in the `php` container part since we will build the php-fpm as the file: `php/Dockerfile`,
 - linked `php` container to `mysql` container using `depends_on` function,
-- created the `mysql` container and please notice the passwords for `dbuser` and `root` user of the MySQL database,
+- created the `mysql` container and please notice the passwords for `zenusr` and `root` user of the MySQL database,
 - Introduced the `initdb.sql` script to create a database in the first place for later test in `mysql` container,
-- Added `volumes` section which shows the volume mapping in the `mysql` container.
+- Added `networks` section which bind all containers into the same network.
 
-4.4 - Edit the **`www/html/index.php`** file and make changes to test the database connection.
+
+
+__4.5__ - Edit the **`www/html/index.php`** file and make changes to test the database connection.
 
 ```
-nano ./www/html/index.php
+nano www/html/index.php
 ```
 
 Make the following changes:
 
 ```
 <!DOCTYPE html>
-<head>
-     <title>Hello LEMP!</title>
-</head>
-
-<body>
-     <h1>Hello LEMP! Testing MySQL Database connection...</h1>
-     <p><?php echo 'We are running PHP, version: ' . phpversion(); ?></p>
-     <?php
-         $database ="testdb";
-         $user = "dbuser";
-         $password = "userPass!2024";
-         $host = "mysql";
-
-         $connection = new PDO("mysql:host={$host};dbname={$database};charset=utf8", $user, $password);
-         $query = $connection->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_TYPE='BASE TABLE'");
-         $tables = $query->fetchAll(PDO::FETCH_COLUMN);
-
-         if (empty($tables)) {
-             echo "<p>There are no tables in database \"{$database}\".</p>";
-         } else {
-             echo "<p>Database \"{$database}\" has the following tables:</p>";
-             echo "<ul>";
-             foreach ($tables as $table) {
-                 echo "<li>{$table}</li>";
-             }
-         echo "</ul>";
-         }
-     ?>
-</body>
+<html>
+	<head><title>Hello PHP8!</title></head>
+    <body>
+        <h1>Hello, PHP!</h1>
+        <?php
+            $dsn = 'mysql:dbname=proddb;host=mariadb';
+            $user = 'zenusr';
+            $password = 'userP@ss2024';
+            
+            try {
+                $pdo = new PDO($dsn, $user, $password);
+                /* @var $pdo PDO */
+                echo "Current Connected Database: " . $pdo->query("select database()")->fetchColumn() . " by user: " . $user;
+            } catch (PDOException $e) {
+                echo 'Connection failed: ' . $e->getMessage();
+            }
+        ?>
+        <h1>PHP Information Sheet:</h1>
+        <p><?php phpinfo(); ?></p>
+    </body>
 </html>
 ```
 
-Save and close the file.
+Please note, the `host` is neither `localhost` nor `127.0.0.1`, but `mariadb` - that's the name of service in the `docker-compose.yml`, weird, huh?, but it is what it is.
 
-4.5 - then launch the container with the following command:
+Save and close the file. 
+
+__4.6__ - then launch the container with the following command:
 
 ```
 docker compose up -d
@@ -484,35 +550,110 @@ docker ps -a
 
 You should see the following output:
 
-> CONTAINER ID   IMAGE           COMMAND                  CREATED             STATUS                      PORTS                                    NAMES
-> 876cebbb5c51   lemp-demo-php   "docker-php-entrypoi…"   2 minutes ago       Up 2 minutes                9000/tcp         php8
-> 26855467841e   mysql:8.0.40    "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes                                               db
-> 3d80d69f9582   nginx:latest    "/docker-entrypoint.…"   About an hour ago   Up About a minute           0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   web
+> CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS            NAMES
+> 4efdda201930   nginx:latest    "/docker-entrypoint.…"   48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   web
+> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"   51 seconds ago   Up 42 seconds   9000/tcp                                  php8
+> d3e0f477367e   mariadb:10.11   "docker-entrypoint.s…"   55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp                           mariadb
 
-Also access **http://localhost:8080** to take a look.
+Also access **http://localhost:8080** to take a look. Obviously the `zenusr` user can access database: `testdb`.
 
-![DB-connected](assets/p6.png)
+![zenusr-with-access-to-testdb](assets/p6.png)
 
-4.6 - More Connection Test
+But `proddb` is not accessible.
 
-As you can see, there are no tables in the mydb database.
+![zenusr-with-no-access-to-proddb](assets/p7.png)
 
-However, there are, in fact, some tables that are not visible to a regular user. If you want to see them, edit the index.php file and change **$user** to **“root”** and **$password** to **“secret.”**
+__4.7__ - More Connection Test
+
+However, the `root` user can access all of the databases if you edit the `www/html/index.php` file by changing **$user** to **“root”** and **$password** to **“rootP@ss2024”**.
 
 ```
-nano ./www/html/index.php
+nano www/html/index.php
 ```
 
 Change the following line:
 
 ```
 $user = "root";  
-$password = "rootPass!2024";  
+$password = "rootP@ss2024";  
 ```
 
-Save and close the file, then refresh the page. You should see the database with all tables on the following screen:
+Save and close the file, then refresh the page. You should "see" the database `proddb` with `root` user:
 
-![img-not-updated](assets/p7.png)
+![img-not-updated](assets/p8.png)
+
+
+
+### 5- Final Touch-up
+
+The final touch-up is to hook up the [phpMyAdmin](https://phpmyadmin.net). 
+
+phpMyAdmin is a free software tool written in [PHP](https://php.net/), intended to handle the administration of [MySQL](https://www.mysql.com/) over the Web. phpMyAdmin supports a wide range of operations on MySQL and MariaDB. Frequently used operations (managing databases, tables, columns, relations, indexes, users, permissions, etc) can be performed via the user interface, while you still have the ability to directly execute any SQL statement.
+
+Nothing special, just simply add a service named "`phpmyadmin`" in the end of the `docker-compose.yml` file.
+
+```shell
+  ......
+
+  # phpMyAdmin Service
+  phpmyadmin:
+      container_name: phpadm
+      image: phpmyadmin/phpmyadmin:latest
+      restart: always
+      ports:
+        - 8090:80
+      environment:
+        PMA_HOST: mariadb
+      depends_on:
+        - mariadb
+      networks:
+        - lemp-demo
+
+# Networks
+networks:
+  lemp-demo:
+```
+
+Then fire up the dockers. And access __http://localhost:8080__ for the web and __http://localhost:8090__ for the phpMyAdmin site (log in as `root` and its password).
+
+![phpMyAdmin-login](assets/p9.png)
+
+And the Admin GUI:
+
+![phpMyAdmin-GUI](assets/p10.png)
+
+
+
+### 6- Environment Restoration
+
+6.1 take down all containers
+
+```shell
+## To remove all comtainers created by this docker-compose.yml file, do:
+docker compose down
+
+## Alternatively remove all containers created by any yml files, do:
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+```
+
+6.2 remove newly-created image
+
+```shell
+docker images
+docker image rm lemp-demo-php
+```
+
+6.3 remove some left-over folders and files
+
+```shell
+sudo rm -rf db/data/*
+sudo rm -rf nginx/logs/*
+## As needed
+sudo rm www/html/config.inc.php
+```
+
+
 
 ## Conclusion
 

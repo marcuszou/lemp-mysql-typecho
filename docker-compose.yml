@@ -11,8 +11,9 @@ services:
     environment:
       - TZ=America/Edmonton
     links:
-      - 'php'
+      - php
     volumes:
+      #- ./www/html/:/var/www/html/
       - ./www/typecho/:/var/www/html/
       - ./nginx/conf/:/etc/nginx/conf.d/
       - ./nginx/logs/:/var/log/nginx/
@@ -32,6 +33,7 @@ services:
     environment:
       - TZ=America/Edmonton
     volumes:
+      #- ./www/html/:/var/www/html/
       - ./www/typecho/:/var/www/html/
       - ./php/php-log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
       - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
@@ -42,18 +44,18 @@ services:
 
   # MariaDB Service
   mariadb:
-    container_name: db
+    container_name: mariadb
     image: mariadb:10.11
+    expose:
+      - 3306:3306
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootPass!2024
-      MYSQL_DATABASE: typecho
-      MYSQL_USER: dbmgr
-      MYSQL_PASSWORD: userPass!2024
-      TZ: America/Edmonton
+    env_file:
+      - ./db/env/mysql.env
     volumes:
-      - ./init/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
-      - ./dbdata:/var/lib/mysql
+      #- ./init/initdb-html.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - ./init/initdb-typecho.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - ./db/data/:/var/lib/mysql/
+      - ./db/logs/:/var/log/mysql/
     networks:
       - lemp-net
 
