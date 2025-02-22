@@ -98,7 +98,7 @@ A detailed note can be found at [Step-by-Step Guide](Step-by-Step-Guide-LEMP.md)
 * You are strongly recommended to edit this `./db/env/mysql.env` to replace the passwords as needed.
 
 * This docker configuration has not been security consolidated (with ssl). Expose it to public networks at your own risk!
-* If you place the containers in the Cloud Service Providers (AWS, GCP, Azure, Digital Ocean, etc.), the SSL question will taken care by them automatically.
+* If you place the containers in the Cloud Service Providers (AWS, GCP, Azure, Digital Ocean, etc.), the SSL question will be taken care by them automatically.
 * If you place them in a home NAS, you could manage the SSL with Nginx Proxy Manager via Let's Encrypt service.
 
 
