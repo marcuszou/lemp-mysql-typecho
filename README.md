@@ -57,7 +57,7 @@ It's been a while since I decided to migrate my Blog from [LAMP](https://www.ibm
 
 3. Configure the Database connection as below: 
 
-   Please note: (1) the "__database path__" is __localhost__ (or 127.0.0.1) if you setup the `./db/env/mysql.env` in the similar manner as what I do (__CREATE USER 'zenusr'@'localhost'__), otherwise use `mariadb` as database path and `root` as database user.
+   Please note: (1) the "__database path__" is __localhost__ (or 127.0.0.1) if you setup the `./init/initdb-typecho.sql` in the similar manner as what I do (__CREATE USER 'zenusr'@'localhost'__), otherwise use `mariadb` as database path and `root` as database user.
 
    ![setup-p3](assets/setup-p3.png)
 
