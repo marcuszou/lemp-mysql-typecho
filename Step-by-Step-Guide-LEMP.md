@@ -60,13 +60,13 @@ touch README.md docker-compose.yml init/initdb.sql nginx/conf/default.conf
 touch db/{conf/my.cnf,env/mysql.env} 
 touch php/{Dockerfile,php.ini,php-log.conf} www/html/index.php
 ## display the folder/files structure
-tree ../lemp-demo
+tree
 ```
 
 Here is the output of last command above: Exactly same as what we designed, fantastic, isn't it?
 
 ```shell
-../lemp-demo
+.
 ├── README.md
 ├── db
 │   ├── conf
@@ -129,8 +129,8 @@ docker ps -a
 
 You should see the following output:
 
-> CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS          NAMES
-> 9ae6179481c9   nginx:latest   "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   web
+> CONTAINER ID   IMAGE            COMMAND                      CREATED             STATUS             PORTS                           NAMES
+> 9ae6179481c9   nginx:latest   "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes   0.0.0.0:8080->80/tcp   web
 
 Now, open your web browser and access your Nginx container using the URL **http://localhost:8080**. You should see the Nginx test page on the following screen:
 
@@ -271,9 +271,9 @@ docker ps -a
 
 You should see the following output:
 
-> CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS                                     NAMES
-> 3d80d69f9582   nginx:latest   "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   web
-> 09d0a9ac59ac   php:8.1-fpm    "docker-php-entrypoi…"   2 minutes ago        Up About a minute   9000/tcp                                  php8
+> CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS                                 NAMES
+> 3d80d69f9582   nginx:latest   "/docker-entrypoint.…"   2 minute ago   Up 1 minute   0.0.0.0:8080->80/tcp        web
+> 09d0a9ac59ac   php:8.1-fpm    "docker-php-entrypoi…"   2 minutes ago   Up 1 minute   9000/tcp                       php8
 
 Now, open your web browser and access the URL **http://localhost:8080**. You should see your Hello World page:
 
@@ -550,10 +550,10 @@ docker ps -a
 
 You should see the following output:
 
-> CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS            NAMES
-> 4efdda201930   nginx:latest    "/docker-entrypoint.…"   48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   web
-> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"   51 seconds ago   Up 42 seconds   9000/tcp                                  php8
-> d3e0f477367e   mariadb:10.11   "docker-entrypoint.s…"   55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp                           mariadb
+> CONTAINER ID   IMAGE                    COMMAND                         CREATED              STATUS               PORTS                            NAMES
+> 4efdda201930   nginx:latest            "/docker-entrypoint.…"    48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp   web
+> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"   51 seconds ago   Up 42 seconds   9000/tcp                       php8
+> d3e0f477367e   mariadb:10.11      "docker-entrypoint.s…"     55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp            mariadb
 
 Also access **http://localhost:8080** to take a look. Obviously the `zenusr` user can access database: `testdb`.
 

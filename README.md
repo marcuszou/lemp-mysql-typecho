@@ -17,19 +17,34 @@ It's been a while since I decided to migrate my Blog from [LAMP](https://www.ibm
 
 
 
+## Tech Stack and Notes
+
+* This repo provides containers with Tech Stack:
+  * __Linux__: Debian/Ubuntu is preferred, but it shouldn't matter much as far as you have a Docker Engine/Desktop installed
+  * __Nginx__: latest is preferred, could select nginx: alpine for a smaller sized container)
+  * __MariaDB__:10.11 (LTS, selected) or MariaDB:11.4 (LTS) or MySQL:8.0.38-Debian
+  * __PHP__: 8.2-FPM (customized with quite a bunch of PHP extensions)
+* Code in the `www` directory will be mapped into the Nginx container at `/var/www/html`
+* Nginx will grab code from the `www` directory.
+  * By default, `www/html/index.php` will provide you a `phpinfo()` report once mapped.
+  * Current `Typecho` blog system is served at `www/typecho/` folder, to be mapped to `/var/www/html/` in the containers.
+* If you want to use this repo for your dev, it is suggested you customize per your own project env.
+
+
+
 ## Quick-Start
 
-1. Git clone my repo: https://github.com/marcuszou/lemp-typecho.git.
+1. Git clone my repo: https://github.com/marcuszou/lemp-mysql-typecho.git.
 
    ```shell
-   git clone https://github.com/marcuszou/lemp-typecho.git
+   git clone https://github.com/marcuszou/lemp-mysql-typecho.git
    ```
 
 2. Fine tune the `docker-compose.yml` as needed.
 
    ```shell
-   sudo chown -R $USER:$USER ./lemp-typecho
-   cd lemp-typecho
+   sudo chown -R $USER:$USER ./lemp-mysql-typecho
+   cd lemp-mysql-typecho
    nano docker-compose.yml
    ```
 
@@ -74,21 +89,6 @@ It's been a while since I decided to migrate my Blog from [LAMP](https://www.ibm
 ## Detailed Notes: How to dockerize this LEMP Stack
 
 A detailed note can be found at [Step-by-Step Guide](Step-by-Step-Guide-LEMP.md). Feel free to distribute if you find it helpful.
-
-
-
-## Tech Stack and Notes
-
-* This repo provides containers with Tech Stack:
-    * __Linux__: Debian/Ubuntu is preferred, but it shouldn't matter much as far as you have a Docker Engine/Desktop installed
-    * __Nginx__:latest (could select nginx: alpine for a smaller sized container)
-    * __MariaDB__:10.11 (LTS, selected) or MariaDB:11.4 (LTS) or MySQL:8.0.38-Debian
-    * __PHP__:8.1-FPM (customized with quite a bunch of PHP extensions)
-* Code in the `www` directory will be mapped into the Nginx container at `/var/www/html`
-* Nginx will grab code from the `www` directory.
-    * By default, `www/html/index.php` will provide you a `phpinfo()` report once mapped.
-    * Current `Typecho` blog system is served at `www/typecho/` folder, to be mapped to `/var/www/html/` in the containers.
-* If you want to use this repo for your dev, it is suggested you customize per your own project env.
 
 
 

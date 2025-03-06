@@ -4,7 +4,7 @@ services:
   # Nginx Service
   nginx:
     container_name: web
-    image: nginx:latest
+    image: nginx:alpine
     ports:
       - 8080:80
     restart: always
@@ -45,7 +45,7 @@ services:
   # MariaDB Service
   mariadb:
     container_name: mariadb
-    image: mariadb:10.11
+    image: mariadb:11.4
     expose:
       - 3306:3306
     restart: always
