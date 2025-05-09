@@ -130,6 +130,7 @@ docker ps -a
 You should see the following output:
 
 > CONTAINER ID   IMAGE            COMMAND                      CREATED             STATUS             PORTS                           NAMES
+> 
 > 9ae6179481c9   nginx:latest   "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes   0.0.0.0:8080->80/tcp   web
 
 Now, open your web browser and access your Nginx container using the URL **http://localhost:8080**. You should see the Nginx test page on the following screen:
