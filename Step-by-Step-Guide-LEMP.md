@@ -272,7 +272,9 @@ docker ps -a
 You should see the following output:
 
 > CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS                                 NAMES
+> 
 > 3d80d69f9582   nginx:latest   "/docker-entrypoint.…"   2 minute ago   Up 1 minute   0.0.0.0:8080->80/tcp        web
+> 
 > 09d0a9ac59ac   php:8.1-fpm    "docker-php-entrypoi…"   2 minutes ago   Up 1 minute   9000/tcp                       php8
 
 Now, open your web browser and access the URL **http://localhost:8080**. You should see your Hello World page:
