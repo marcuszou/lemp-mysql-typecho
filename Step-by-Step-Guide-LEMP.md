@@ -345,7 +345,7 @@ nano php/Dockerfile
 Add the following lines:
 
 ```
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 # Installing dependencies for the PHP modules
 RUN apt-get update
