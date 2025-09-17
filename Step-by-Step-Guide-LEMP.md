@@ -548,18 +548,21 @@ Verify all running containers with the following command:
 ```
 docker images
 ## There must be a new custom image named as "lemp-demo-php".
-## REPOSITORY              TAG             IMAGE ID       CREATED          SIZE
-## lemp-demo-php           latest          8193b9dc9457   57 seconds ago   630MB
+## REPOSITORY      TAG       IMAGE ID       CREATED          SIZE
+## lemp-demo-php   latest    8193b9dc9457   57 seconds ago   605MB
+## nginx           latest    41f689c20910   4 weeks ago      192MB
+## mariadb         10.11     406d3edaa460   5 weeks ago      327MB
+## php             8.2-fpm   74cc8d2d610a   5 weeks ago      490MB
 docker ps -a
 ## There are 3 containers now.
 ```
 
 You should see the following output:
 
-> CONTAINER ID   IMAGE                    COMMAND                         CREATED              STATUS               PORTS                            NAMES
-> 4efdda201930   nginx:latest            "/docker-entrypoint.…"    48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp   web
-> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"   51 seconds ago   Up 42 seconds   9000/tcp                       php8
-> d3e0f477367e   mariadb:10.11      "docker-entrypoint.s…"     55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp            mariadb
+> CONTAINER ID   IMAGE           COMMAND                   CREATED          STATUS          PORTS                  NAMES
+> 4efdda201930   nginx:latest    "/docker-entrypoint.…"    48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp   web
+> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"    51 seconds ago   Up 42 seconds   9000/tcp               php8
+> d3e0f477367e   mariadb:10.11   "docker-entrypoint.s…"    55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp        mariadb
 
 Also access **http://localhost:8080** to take a look. Obviously the `zenusr` user can access database: `testdb`.
 
