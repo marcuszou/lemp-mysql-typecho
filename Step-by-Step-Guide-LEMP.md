@@ -620,7 +620,11 @@ networks:
   lemp-demo:
 ```
 
-Then fire up the dockers. And access __http://localhost:8080__ for the web and __http://localhost:8090__ for the phpMyAdmin site (log in as `root` and its password).
+Then fire up the dockers by:
+```
+docker compose up -d
+```
+And access __http://localhost:8080__ for the web and __http://localhost:8090__ for the phpMyAdmin site (log in as `root` and its password).
 
 ![phpMyAdmin-login](assets/p9.png)
 
