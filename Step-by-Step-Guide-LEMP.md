@@ -256,7 +256,7 @@ Save and close the file when you finish.
 
 The above file will 
 
-- create a new PHP container (based on docker image: `php:8.1-pfm`), expose PHP-FPM on port 9000, 
+- create a new PHP container (based on docker image: `php:8.2-pfm`), expose PHP-FPM on port 9000, 
 - link the Nginx container to PHP container, 
 - pour the `./nginx/conf/default.conf` file to the Nginx container at `/etc/nginx/conf.d/` folder, 
 - map and mount the volume to the PHP container so that all content at `./www/html` folder will be in sync with the container’s directory `/var/www/html/`.
