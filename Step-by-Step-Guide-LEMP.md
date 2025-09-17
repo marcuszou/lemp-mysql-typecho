@@ -490,7 +490,7 @@ Save and close the file.
 
 Please note the changes in the `docker-compose.yml` file:
 
-- modified `image:8.1-fpm` to `build: php` in the `php` container part since we will build the php-fpm as the file: `php/Dockerfile`,
+- modified `image:8.2-fpm` to `build: php` in the `php` container part since we will build the php-fpm as the file: `php/Dockerfile`,
 - linked `php` container to `mysql` container using `depends_on` function,
 - created the `mysql` container and please notice the passwords for `zenusr` and `root` user of the MySQL database,
 - Introduced the `initdb.sql` script to create a database in the first place for later test in `mysql` container,
