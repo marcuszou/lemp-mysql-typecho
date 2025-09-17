@@ -555,14 +555,11 @@ docker images
 ## php             8.2-fpm   74cc8d2d610a   5 weeks ago      490MB
 docker ps -a
 ## There are 3 containers now.
+## CONTAINER ID   IMAGE           COMMAND                   CREATED          STATUS          PORTS                  NAMES
+## 4efdda201930   nginx:latest    "/docker-entrypoint.…"    48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp   web
+## 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"    51 seconds ago   Up 42 seconds   9000/tcp               php8
+## d3e0f477367e   mariadb:10.11   "docker-entrypoint.s…"    55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp        mariadb
 ```
-
-You should see the following output:
-
-> CONTAINER ID   IMAGE           COMMAND                   CREATED          STATUS          PORTS                  NAMES
-> 4efdda201930   nginx:latest    "/docker-entrypoint.…"    48 seconds ago   Up 39 seconds   0.0.0.0:8080->80/tcp   web
-> 0cd2a27c448a   lemp-demo-php   "docker-php-entrypoi…"    51 seconds ago   Up 42 seconds   9000/tcp               php8
-> d3e0f477367e   mariadb:10.11   "docker-entrypoint.s…"    55 seconds ago   Up 45 seconds   0/tcp, 3306/tcp        mariadb
 
 Also access **http://localhost:8080** to take a look. Obviously the `zenusr` user can access database: `testdb`.
 
