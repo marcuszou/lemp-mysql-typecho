@@ -643,15 +643,15 @@ And the Admin GUI:
 docker compose down
 
 ## Alternatively remove all containers created by any yml files, do:
-docker stop $(docker ps -aq)
-docker rm $(docker ps -aq)
+## docker stop $(docker ps -q)
+## docker rm $(docker ps -q)
 ```
 
 6.2 remove newly-created image
 
 ```shell
 docker images
-docker image rm lemp-demo-php
+docker image rm $(docker images -q)
 ```
 
 6.3 remove some left-over folders and files
