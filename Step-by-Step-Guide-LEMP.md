@@ -118,7 +118,10 @@ The above file will download the latest Nginx image, create an Nginx container (
 Next, launch the Nginx container with the following command:
 
 ```
+## In NAS
 docker-compose up -d
+## or in Ubuntu/Debian
+docker compose up -d
 ```
 
 You can check the running container with the following command:
@@ -242,7 +245,7 @@ services:
   # PHP-FPM Service
   php:
     container_name: php8
-    image: php:8.1-fpm
+    image: php:8.2-fpm
     expose:
       - 9000
     volumes:
@@ -276,7 +279,7 @@ You should see the following output:
 > 
 > 3d80d69f9582   nginx:latest   "/docker-entrypoint.…"   2 minute ago   Up 1 minute   0.0.0.0:8080->80/tcp        web
 > 
-> 09d0a9ac59ac   php:8.1-fpm    "docker-php-entrypoi…"   2 minutes ago   Up 1 minute   9000/tcp                       php8
+> 09d0a9ac59ac   php:8.2-fpm    "docker-php-entrypoi…"   2 minutes ago   Up 1 minute   9000/tcp                       php8
 
 Now, open your web browser and access the URL **http://localhost:8080**. You should see your Hello World page:
 
